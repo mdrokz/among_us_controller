@@ -4,10 +4,11 @@
 #include <fcntl.h>
 #include <linux/input.h>
 #include <unistd.h>
+#include <string.h>
 
 #define LENGTH(x) (sizeof(*x) / sizeof((x)[0]))
 
-int mouse_fd = 0;
+static int mouse_fd = 0;
 
 void MouseInit()
 {
