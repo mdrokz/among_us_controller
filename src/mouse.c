@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#define LENGTH(x) (sizeof(*x) / sizeof((x)[0]))
+#define LENGTH(x) (sizeof(*x) / sizeof((x)[0]))                                                               
 
 static int mouse_fd = 0;
 

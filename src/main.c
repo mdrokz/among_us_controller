@@ -1,4 +1,5 @@
 #include "../headers/keyboard.h"
+#include "../headers/controls.h"
 // input_event composite literal macro
 #define EVENT(type, code, v) \
     ((struct input_event){(struct timeval){0, 0}, type, code, v})
@@ -42,6 +43,87 @@ int main(void)
                 else if (j_evs.type == JS_EVENT_BUTTON)
                 {
                     printf("button event");
+                    switch (j_evs.number)
+                    {
+
+                    case GKill:
+                    {
+                        if (j_evs.value)
+                        {
+                            WriteKeyboardEvent(EVENT(EV_KEY, Kill, 1));
+                        }
+                        else
+                        {
+                            WriteKeyboardEvent(EVENT(EV_KEY, Kill, 0));
+                        }
+                    }
+                    break;
+
+                    case GBack:
+                    {
+                        if (j_evs.value)
+                        {
+                            WriteKeyboardEvent(EVENT(EV_KEY, Back, 1));
+                        }
+                        else
+                        {
+                            WriteKeyboardEvent(EVENT(EV_KEY, Back, 0));
+                        }
+                    }
+                    break;
+
+                    case GAction:
+                    {
+                        if (j_evs.value)
+                        {
+                            WriteKeyboardEvent(EVENT(EV_KEY, Action, 1));
+                        }
+                        else
+                        {
+                            WriteKeyboardEvent(EVENT(EV_KEY, Action, 0));
+                        }
+                    }
+                    break;
+
+                    case GMap:
+                    {
+                        if (j_evs.value)
+                        {
+                            WriteKeyboardEvent(EVENT(EV_KEY, Map, 1));
+                        }
+                        else
+                        {
+                            WriteKeyboardEvent(EVENT(EV_KEY, Map, 0));
+                        }
+                    }
+                    break;
+
+                    case GClick:
+                    {
+                        if (j_evs.value)
+                        {
+                            WriteKeyboardEvent(EVENT(EV_KEY, BTN_LEFT, 1));
+                        }
+                        else
+                        {
+                            WriteKeyboardEvent(EVENT(EV_KEY, BTN_LEFT, 0));
+                        }
+                    }
+                    break;
+
+                    case GReport:
+                    {
+                        if (j_evs.value)
+                        {
+                            WriteKeyboardEvent(EVENT(EV_KEY, Report, 1));
+                        }
+                        else
+                        {
+                            WriteKeyboardEvent(EVENT(EV_KEY, Report, 0));
+                        }
+                    }
+                    break;
+                    }
                 }
             }
             /* do something interesting with processed events */
@@ -49,7 +131,7 @@ int main(void)
     }
     else
     {
-        printf("No Joystick detected at %s",GAMEPAD);
+        printf("No Joystick detected at %s", GAMEPAD);
         return 0;
     }
 
