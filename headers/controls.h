@@ -1,4 +1,5 @@
 #include <linux/input-event-codes.h>
+#include <linux/joystick.h>
 
 typedef enum KeyboardControls
 {
@@ -17,10 +18,8 @@ typedef enum KeyboardControls
 
 typedef enum GamePadControls {
 
-    // GMoveUp,
-    // GMoveLeft,
-    // GMoveDown,
-    // GMoveRight,
+    GMoveY = 5,
+    GMoveX = 4,
     GKill = 2, // 2 IS B
     GAction = 1, // 1 IS A
     GBack = 5, // 5 IS RT
@@ -29,3 +28,10 @@ typedef enum GamePadControls {
     GReport = 3 // 3 IS Y
 
 } GamePadControls;
+
+
+void ProcessGamepadAxisEvents(struct js_event j_evs);
+
+void ProcessDPADEvents(struct js_event j_evs,int gamepad_fd);
+
+void ProcessGamepadButtonEvents(struct js_event j_evs);
