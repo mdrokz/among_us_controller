@@ -1,6 +1,6 @@
 #include <linux/input-event-codes.h>
 #include <linux/joystick.h>
-#include "../headers/keyboard.h"
+#include "../../headers/linux/keyboard.h"
 
 #define EVENT(type, code, v) \
     ((struct input_event){(struct timeval){0, 0}, type, code, v})

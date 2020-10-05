@@ -1,7 +1,65 @@
-#include "../headers/keyboard.h"
-#include "../headers/controls.h"
-// input_event composite literal macro
+#include <stdio.h>
 
+#ifdef __CYGWIN__
+
+#include "../headers/windows/keyboard.h"
+#include "../headers/windows/controls.h"
+#include <windows.h>
+#include <Xinput.h>
+// #include <winerror.h>
+
+#endif
+
+#ifdef _WIN32
+
+#include "../headers/windows/keyboard.h"
+#include "../headers/windows/controls.h"
+#include <windows.h>
+#include <Xinput.h>
+
+#endif
+
+#ifdef linux
+
+#include "../headers/linux/keyboard.h"
+#include "../headers/linux/controls.h"
+
+#endif
+
+#ifdef __CYGWIN__
+int main(void)
+{
+    DWORD dwResult;
+    for (DWORD i = 0; i < XUSER_MAX_COUNT; i++)
+    {
+        XINPUT_STATE state;
+        ZeroMemory(&state, sizeof(XINPUT_STATE));
+
+        // Simply get the state of the controller from XInput.
+        dwResult = XInputGetState(i, &state);
+
+        if (dwResult == ERROR_SUCCESS)
+        {
+            // Controller is connected
+            printf("1");
+        }
+        else if(dwResult == ERROR_DEVICE_NOT_CONNECTED)
+        {
+            // Controller is not connected
+            printf("2");
+        }
+    }
+}
+#endif
+
+#ifdef _WIN32
+int main(void)
+{
+    printf("hello world");
+}
+#endif
+
+#ifdef linux
 
 #define GAMEPAD "/dev/input/js0"
 
@@ -19,7 +77,6 @@ int main(void)
     // struct input_event evs[] = {EVENT(EV_REL, REL_X, 5), EVENT(EV_REL, REL_Y, 5)};
 
     struct js_event j_evs;
-
 
     gamepad_fd = open(GAMEPAD, O_RDONLY | O_NONBLOCK);
 
@@ -41,7 +98,7 @@ int main(void)
                 else if (j_evs.type == JS_EVENT_AXIS)
                 {
 
-                    ProcessDPADEvents(j_evs,gamepad_fd);
+                    ProcessDPADEvents(j_evs, gamepad_fd);
 
                     ProcessGamepadAxisEvents(j_evs);
                 }
@@ -58,8 +115,10 @@ int main(void)
         printf("No Joystick detected at %s", GAMEPAD);
         return 0;
     }
+
     return 0;
 }
+#endif
 
 /* 
  while (i--)

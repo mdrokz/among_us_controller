@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#include "../headers/controls.h"
+#include "../../headers/linux/controls.h"
 
 #define LENGTH(x) (sizeof(*x) / sizeof((x)[0]))
 

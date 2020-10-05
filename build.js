@@ -1,30 +1,39 @@
 const fs = require('fs');
 const cp = require('child_process');
 
-// library arguments for linking
-var libraries = [''];
+
 
 // if we want to build for debug or release
 var debug = true;
 
 var exec = '';
 
-if(process.platform == 'linux' || process.platform == 'darwin') {
+var isLinux;
+
+if(process.platform == 'linux') {
     exec = 'main'
+    isLinux = true;
 } else if(process.platform == 'win32' ) {
     exec = 'main.exe'
+    isLinux = false;
 }
 
+// library arguments for linking
+var libraries =  isLinux ? [''] : ['-lXinput'];
+
 // read the src directory for files
-fs.readdir('./src', (err, f) => {
+
+var readDir = isLinux ? './src/linux' : './src/windows';
+
+fs.readdir(readDir, (err, f) => {
     if (err) {
         console.err("ERROR:", err);
         process.exit(0);
     } else {
         // exclude main because we are building object files
-        let files = f.filter(x => !x.includes('main'));
+        // let files = f.filter(x => !x.includes('main'));
 
-        files.forEach((v) => {
+        f.forEach((v) => {
             let oName = v.replace('.c', '.o');
             try {
                 fs.unlinkSync(`lib/${oName}`);
@@ -37,7 +46,11 @@ fs.readdir('./src', (err, f) => {
             // fill lib variable with library arguments
             libraries.forEach((v) => lib = lib + " " + v);
             // ${g} ${v} -o ${oName} ${lib}
-            cp.execSync(`gcc ${g} src/${v} -o lib/${oName} ${lib} -c`, (err, stdout, stderr) => {
+            let compilationString =  isLinux ? `gcc ${g} src/linux/${v} -o lib/${oName} ${lib} -c` : `gcc ${g} src/windows/${v} -o lib/${oName} ${lib} -c`; 
+
+            console.log(compilationString);
+
+            cp.execSync(compilationString, (err, stdout, stderr) => {
                 if (err) {
                     console.error(err);
                     console.error(stderr);
@@ -51,7 +64,7 @@ fs.readdir('./src', (err, f) => {
 
         let fileNames = "";
         let g = debug ? '-g' : '';
-        files.forEach((v) => fileNames = fileNames + " " + "lib/" + v.replace('.c', '.o'));
+        f.forEach((v) => fileNames = fileNames + " " + "lib/" + v.replace('.c', '.o'));
         let lib = "";
         libraries.forEach((v) => lib = lib + " " + v);
         console.log(fileNames);
