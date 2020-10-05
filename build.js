@@ -1,14 +1,27 @@
 const fs = require('fs');
 const cp = require('child_process');
 
-
-
 // if we want to build for debug or release
-var debug = true;
+var debug = false;
 
 var exec = '';
 
 var isLinux;
+
+// if we want to cross compile to other platorms
+var crossCompile = false;
+
+
+process.argv.forEach(v => {
+    if(v == '-debug') {
+        debug = true;
+    }
+
+    if(v == '-cross-compile') {
+        crossCompile = true;
+    }
+
+})
 
 if(process.platform == 'linux') {
     exec = 'main'
@@ -20,6 +33,10 @@ if(process.platform == 'linux') {
 
 // library arguments for linking
 var libraries =  isLinux ? [''] : ['-lXinput'];
+
+// library arguments for cross-compile
+
+var crossCompileLibraies = ['-lcomctl32'];
 
 // read the src directory for files
 
@@ -46,8 +63,12 @@ fs.readdir(readDir, (err, f) => {
             // fill lib variable with library arguments
             libraries.forEach((v) => lib = lib + " " + v);
             // ${g} ${v} -o ${oName} ${lib}
-            let compilationString =  isLinux ? `gcc ${g} src/linux/${v} -o lib/${oName} ${lib} -c` : `gcc ${g} src/windows/${v} -o lib/${oName} ${lib} -c`; 
-
+            let compilationString = "";
+            if(crossCompile) {
+                compilationString = `x86_64-w64-mingw32-gcc ${g} src/windows/${v} -o lib/${oName} ${lib} -c`;
+            } else {
+                compilationString =  isLinux ? `gcc ${g} src/linux/${v} -o lib/${oName} ${lib} -c` : `gcc ${g} src/windows/${v} -o lib/${oName} ${lib} -c`; 
+            }
             console.log(compilationString);
 
             cp.execSync(compilationString, (err, stdout, stderr) => {
@@ -66,17 +87,30 @@ fs.readdir(readDir, (err, f) => {
         let g = debug ? '-g' : '';
         f.forEach((v) => fileNames = fileNames + " " + "lib/" + v.replace('.c', '.o'));
         let lib = "";
-        libraries.forEach((v) => lib = lib + " " + v);
+        crossCompileLibraies.forEach((v) => lib = lib + " " + v);
         console.log(fileNames);
-        cp.exec(`gcc ${g} src/main.c -o build/${exec} ${fileNames} ${lib}`, (err, stdout, stderr) => {
-            if (err) {
-                console.error(err);
-                console.error(stderr);
-                process.exit(0);
-            } else {
-                console.log(stdout);
-                console.log(`Command Executed Successfully ${exec}`);
-            }
-        })
+        if(crossCompile) {
+            cp.exec(`x86_64-w64-mingw32-gcc ${g} src/main.c -o build/main.exe ${fileNames} ${crossCompileLibraies}`, (err, stdout, stderr) => {
+                if (err) {
+                    console.error(err);
+                    console.error(stderr);
+                    process.exit(0);
+                } else {
+                    console.log(stdout);
+                    console.log(`Command Executed Successfully main.exe`);
+                }
+            })
+        } else {
+            cp.exec(`gcc ${g} src/main.c -o build/${exec} ${fileNames} ${lib}`, (err, stdout, stderr) => {
+                if (err) {
+                    console.error(err);
+                    console.error(stderr);
+                    process.exit(0);
+                } else {
+                    console.log(stdout);
+                    console.log(`Command Executed Successfully ${exec}`);
+                }
+            })
+        }  
     }
 })

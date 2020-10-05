@@ -2,20 +2,23 @@
 
 #ifdef __CYGWIN__
 
+#define WIN32_LEAN_AND_MEAN
+
 #include "../headers/windows/keyboard.h"
 #include "../headers/windows/controls.h"
 #include <windows.h>
 #include <Xinput.h>
-// #include <winerror.h>
 
 #endif
 
 #ifdef _WIN32
 
+#define WIN32_LEAN_AND_MEAN
+
 #include "../headers/windows/keyboard.h"
 #include "../headers/windows/controls.h"
 #include <windows.h>
-#include <Xinput.h>
+// #include <Xinput.h>
 
 #endif
 
@@ -43,7 +46,7 @@ int main(void)
             // Controller is connected
             printf("1");
         }
-        else if(dwResult == ERROR_DEVICE_NOT_CONNECTED)
+        else if (dwResult == ERROR_DEVICE_NOT_CONNECTED)
         {
             // Controller is not connected
             printf("2");
@@ -55,7 +58,30 @@ int main(void)
 #ifdef _WIN32
 int main(void)
 {
-    printf("hello world");
+    // input event.
+    INPUT ip;
+
+    // Pause for 5 seconds.
+
+    while (1)
+    {
+        // Set up a generic keyboard event.
+        ip.type = INPUT_KEYBOARD;
+        ip.ki.wScan = 0; // hardware scan code for key
+        ip.ki.time = 0;
+        ip.ki.dwExtraInfo = 0;
+
+        // Press the "A" key
+        ip.ki.wVk = 0x41;  // virtual-key code for the "a" key
+        ip.ki.dwFlags = 0; // 0 for key press
+        SendInput(1, &ip, sizeof(INPUT));
+
+        // Release the "A" key
+        ip.ki.dwFlags = KEYEVENTF_KEYUP; // KEYEVENTF_KEYUP for key release
+        SendInput(1, &ip, sizeof(INPUT));
+
+        Sleep(1000);
+    }
 }
 #endif
 
